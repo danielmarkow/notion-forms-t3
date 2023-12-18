@@ -25,7 +25,7 @@ export const notionApiKeys = mysqlTable(
   "notionapikeys",
   {
     id: varchar("id", { length: 21 }).primaryKey(),
-    userEmail: varchar("user_email", { length: 254 }).notNull(),
+    createdById: varchar("createdById", { length: 255 }).notNull(),
     notionApiKey: text("notion_api_key").notNull(),
     notionApiKeyName: text("notion_api_key_name"),
     createdAt: timestamp("created_at")
@@ -35,7 +35,7 @@ export const notionApiKeys = mysqlTable(
   },
   (notionApiKeys) => {
     return {
-      userEmailIndex: index("user_email_idx").on(notionApiKeys.userEmail),
+      createdByIdIdx: index("createdById_idx").on(notionApiKeys.createdById),
     };
   },
 );
@@ -44,7 +44,7 @@ export const notionPageIds = mysqlTable(
   "notionpageids",
   {
     id: varchar("id", { length: 21 }).primaryKey(),
-    userEmail: varchar("user_email", { length: 254 }).notNull(),
+    createdById: varchar("createdById", { length: 255 }).notNull(),
     notionPageId: text("notion_page_id").notNull(),
     notionDbName: text("notion_db_name"),
     notionApiKeyId: varchar("notion_api_key_id", { length: 21 }).notNull(),
@@ -55,7 +55,7 @@ export const notionPageIds = mysqlTable(
   },
   (notionPageIds) => {
     return {
-      userEmailIndex: index("user_email_idx").on(notionPageIds.userEmail),
+      createdByIdIdx: index("createdById_idx").on(notionPageIds.createdById),
     };
   },
 );
