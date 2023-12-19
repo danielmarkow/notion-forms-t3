@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import crypto from "node:crypto";
 import { nanoid } from "nanoid";
 import { notionApiKeys, notionPageIds } from "~/server/db/schema";
@@ -84,21 +80,23 @@ export const notionConfigRouter = createTRPCRouter({
   //     });
   //   }),
   getNotionApiKeysAndPageIds: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.db
-      .select({
-        id: notionApiKeys.id,
-        notionApiKeyName: notionApiKeys.notionApiKeyName,
-        notionPageIdId: notionPageIds.id,
-        notionDbName: notionPageIds.notionDbName,
-        createdAt: notionApiKeys.createdAt,
-        updatedAt: notionApiKeys.updatedAt,
-      })
-      .from(notionApiKeys)
-      .leftJoin(
-        notionPageIds,
-        eq(notionApiKeys.id, notionPageIds.notionApiKeyId),
-      )
-      .where(eq(notionApiKeys.createdById, ctx.session.user.id));
+    return await ctx.db.query.notionApiKeys.findMany({
+      where: eq(notionApiKeys.createdById, ctx.session.user.id),
+      columns: {
+        id: true,
+        notionApiKeyName: true,
+        createdAt: true,
+      },
+      with: {
+        pageIds: {
+          columns: {
+            id: true,
+            notionDbName: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
   }),
   addNotionPageId: protectedProcedure
     .input(

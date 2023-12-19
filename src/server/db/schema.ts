@@ -17,12 +17,10 @@ import { type AdapterAccount } from "next-auth/adapters";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const mysqlTable = mysqlTableCreator(
-  (name) => `notion-forms-t3_${name}`,
-);
+export const mysqlTable = mysqlTableCreator((name) => `notionf_${name}`);
 
 export const notionApiKeys = mysqlTable(
-  "notionapikeys",
+  "apikeys",
   {
     id: varchar("id", { length: 21 }).primaryKey(),
     createdById: varchar("createdById", { length: 255 }).notNull(),
@@ -40,15 +38,19 @@ export const notionApiKeys = mysqlTable(
   },
 );
 
+export const apiKeyRelations = relations(notionApiKeys, ({ many }) => ({
+  pageIds: many(notionPageIds),
+}));
+
 export const notionPageIds = mysqlTable(
-  "notionpageids",
+  "pageids",
   {
     id: varchar("id", { length: 21 }).primaryKey(),
     createdById: varchar("createdById", { length: 255 }).notNull(),
     notionPageId: text("notion_page_id").notNull(),
     notionDbName: text("notion_db_name"),
     notionApiKeyId: varchar("notion_api_key_id", { length: 21 }).notNull(),
-    /*.references(() => notionApiKeys.id)*/ createdAt: timestamp("created_at")
+    createdAt: timestamp("created_at")
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     updatedAt: timestamp("updatedAt").onUpdateNow(),
@@ -59,6 +61,13 @@ export const notionPageIds = mysqlTable(
     };
   },
 );
+
+export const pageIdRelations = relations(notionPageIds, ({ one }) => ({
+  notionApiKeyId: one(notionApiKeys, {
+    fields: [notionPageIds.notionApiKeyId],
+    references: [notionApiKeys.id],
+  }),
+}));
 
 export const posts = mysqlTable(
   "post",
