@@ -3,16 +3,32 @@
 import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
 
-type Page = {
-  [key: string]: {
-    type: string;
-    [key: string]:
-      | string
-      | { start: string }
-      | { name: string }[]
-      | [{ type: string; text: { content: string; link: null | string } }];
+type NotionDate = {
+  type: "date";
+  data: {
+    start: string;
   };
 };
+
+type NotionTitle = {
+  type: "title";
+  title: { type: "text"; text: { content: string; link: string | null } }[];
+};
+
+type NotionMultiSelect = {
+  type: "multi_select";
+  multi_select: { name: string } | null[];
+};
+
+type NotionUrl = {
+  type: "url";
+  url: string;
+};
+
+type NotionPage = Record<
+  string,
+  NotionDate | NotionTitle | NotionMultiSelect | NotionUrl
+>;
 
 export default function NotionForm({ params }: { params: { formId: string } }) {
   const { data, isSuccess, isError } = api.notionData.getFormStructure.useQuery(
@@ -20,38 +36,36 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
       notionPageIdId: params.formId,
     },
   );
-  const [formState, setFormState] = useState<Page>();
+
+  const [formState, setFormState] = useState<NotionPage>();
   const generateNewPage = () => {
-    const newPage: Page = {};
+    const newPage: NotionPage = {};
 
-    const formKeys = Object.keys(data.formStructure);
-    const formStructure = data.formStructure;
+    const formKeys = Object.keys(data!.formStructure);
+    const formStructure = data!.formStructure;
 
-    // for (let i = 0; i < formKeys.length; i++) {
     for (const k of formKeys) {
       // TODO add other properties
-      if (formStructure[k]["type"] === "date") {
-        newPage[formKeys[k]] = {
-          type: formStructure[k]["type"],
-          [formStructure[k]["type"]]: { start: "" },
-        };
-      } else if (formStructure[k]["type"] === "title") {
+      if (formStructure[k]!.type === "date") {
         newPage[k] = {
-          type: formStructure[k]["type"],
-          [formStructure[k]["type"]]: [
-            { type: "text", text: { content: "", link: null } },
-          ],
-        };
-      } else if (formStructure[k]["type"] === "multi_select") {
+          type: formStructure[k]!.type,
+          data: { start: "" },
+        } as NotionDate;
+      } else if (formStructure[k]!.type === "title") {
         newPage[k] = {
-          type: formStructure[k]["type"],
-          [formStructure[k]["type"]]: [],
-        };
-      } else if (formStructure[k]["type"] === "url") {
+          type: formStructure[k]!.type,
+          title: [{ type: "text", text: { content: "", link: null } }],
+        } as NotionTitle;
+      } else if (formStructure[k]!.type === "multi_select") {
         newPage[k] = {
-          type: formStructure[k]["type"],
-          [formStructure[k]["type"]]: "",
-        };
+          type: "multi_select",
+          multi_select: [],
+        } as NotionMultiSelect;
+      } else if (formStructure[k]!.type === "url") {
+        newPage[k] = {
+          type: "url",
+          url: "",
+        } as NotionUrl;
       }
     }
     return newPage;
@@ -67,7 +81,18 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
     return (
       <>
         <p>form id: {params.formId}</p>
+        {/* <p>{JSON.stringify(data.formStructure)}</p> */}
+        {/* <p>
+          {Object.keys(data.formStructure).map((k) => (
+            <p>{JSON.stringify(data.formStructure[k])}</p>
+          ))}
+        </p> */}
         <p>{JSON.stringify(formState)}</p>
+        <form>
+          <div>
+            <label htmlFor=""></label>
+          </div>
+        </form>
       </>
     );
 
