@@ -8,7 +8,7 @@ import { TRPCError } from "@trpc/server";
 import { Client } from "@notionhq/client";
 import type { Database } from "~/app/_types/database";
 
-export function decrypt(
+function decrypt(
   encrypted: string,
   CRYPTO_PASSWORD: string,
   CRYPTO_IV: string,
@@ -24,73 +24,80 @@ export function decrypt(
   return decrypted;
 }
 
+async function getNotionCredentials(notionPageIdId: string, userId: string) {
+  const pageData = await db
+    .select({
+      notionPageId: notionPageIds.notionPageId,
+      notionApiKeyId: notionPageIds.notionApiKeyId,
+    })
+    .from(notionPageIds)
+    .where(
+      and(
+        eq(notionPageIds.id, notionPageIdId),
+        eq(notionPageIds.createdById, userId),
+      ),
+    );
+
+  if (pageData.length > 0) {
+    const notionPageId = decrypt(
+      pageData[0]!.notionPageId,
+      process.env.CRYPTO_PASSWORD!,
+      process.env.CRYPTO_IV!,
+    );
+
+    const apiKeyData = await db
+      .select({
+        notionApiKey: notionApiKeys.notionApiKey,
+      })
+      .from(notionApiKeys)
+      .where(
+        and(
+          eq(notionApiKeys.id, pageData[0]!.notionApiKeyId),
+          eq(notionApiKeys.createdById, userId),
+        ),
+      );
+
+    if (apiKeyData.length > 0) {
+      const notionApiKey = decrypt(
+        apiKeyData[0]!.notionApiKey,
+        process.env.CRYPTO_PASSWORD!,
+        process.env.CRYPTO_IV!,
+      );
+      return { notionApiKey, notionPageId };
+    } else {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Error retrieving Notion Credentials",
+      });
+    }
+  } else {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Error retrieving Notion Credentials",
+    });
+  }
+}
+
 export const notionDataRouter = createTRPCRouter({
   getFormStructure: protectedProcedure
     .input(z.object({ notionPageIdId: z.string() }))
     .query(async ({ ctx, input }) => {
-      // get actual page id
-      const pageData = await db
-        .select({
-          notionPageId: notionPageIds.notionPageId,
-          notionApiKeyId: notionPageIds.notionApiKeyId,
-        })
-        .from(notionPageIds)
-        .where(
-          and(
-            eq(notionPageIds.id, input.notionPageIdId),
-            eq(notionPageIds.createdById, ctx.session.user.id),
-          ),
-        );
+      const notionCredentials = await getNotionCredentials(
+        input.notionPageIdId,
+        ctx.session.user.id,
+      );
 
-      if (pageData.length > 0) {
-        const notionPageId = decrypt(
-          pageData[0]!.notionPageId,
-          process.env.CRYPTO_PASSWORD!,
-          process.env.CRYPTO_IV!,
-        );
+      // query notion
+      const notion = new Client({
+        auth: notionCredentials.notionApiKey,
+      });
+      const notionDb = (await notion.databases.retrieve({
+        database_id: notionCredentials.notionPageId,
+      })) as Database;
 
-        const apiKeyData = await db
-          .select({
-            notionApiKey: notionApiKeys.notionApiKey,
-          })
-          .from(notionApiKeys)
-          .where(
-            and(
-              eq(notionApiKeys.id, pageData[0]!.notionApiKeyId),
-              eq(notionApiKeys.createdById, ctx.session.user.id),
-            ),
-          );
+      const dbInfo = notionDb.description;
+      const formStructure = notionDb.properties;
 
-        if (apiKeyData.length > 0) {
-          const notionApiKey = decrypt(
-            apiKeyData[0]!.notionApiKey,
-            process.env.CRYPTO_PASSWORD!,
-            process.env.CRYPTO_IV!,
-          );
-
-          // query notion
-          const notion = new Client({
-            auth: notionApiKey,
-          });
-          const notionDb = (await notion.databases.retrieve({
-            database_id: notionPageId,
-          })) as Database;
-
-          const dbInfo = notionDb.description;
-          const formStructure = notionDb.properties;
-
-          return { dbInfo, formStructure };
-        } else {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Error retrieving Notion Credentials",
-          });
-        }
-      } else {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Error retrieving Notion Credentials",
-        });
-      }
+      return { dbInfo, formStructure };
     }),
 });
