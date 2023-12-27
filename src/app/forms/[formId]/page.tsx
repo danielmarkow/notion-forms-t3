@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MultiSelectOption } from "~/app/_types/database";
 import { api } from "~/trpc/react";
 
 type NotionDate = {
@@ -17,7 +18,7 @@ type NotionTitle = {
 
 type NotionMultiSelect = {
   type: "multi_select";
-  multi_select: { name: string } | null[];
+  multi_select: { name: string }[] | null;
 };
 
 type NotionUrl = {
@@ -27,7 +28,7 @@ type NotionUrl = {
 
 type NotionPage = Record<
   string,
-  NotionDate | NotionTitle | NotionMultiSelect | NotionUrl
+  NotionUrl | NotionTitle | NotionMultiSelect | NotionDate
 >;
 
 export default function NotionForm({ params }: { params: { formId: string } }) {
@@ -77,21 +78,126 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
     }
   }, [data]);
 
-  if (isSuccess)
+  if (isSuccess && formState !== undefined)
     return (
       <>
         <p>form id: {params.formId}</p>
-        {/* <p>{JSON.stringify(data.formStructure)}</p> */}
+        {/* <p>{JSON.stringify(data.formStructure.Tags.multi_select.options)}</p> */}
         {/* <p>
           {Object.keys(data.formStructure).map((k) => (
             <p>{JSON.stringify(data.formStructure[k])}</p>
           ))}
         </p> */}
+        {/* <p>{JSON.stringify(formState)}</p> */}
         <p>{JSON.stringify(formState)}</p>
         <form>
-          <div>
-            <label htmlFor=""></label>
-          </div>
+          {Object.keys(formState).map((k) => (
+            <div key={k}>
+              {formState[k]?.type === "url" && (
+                <div>
+                  <label htmlFor={k} className="block">
+                    {k}
+                  </label>
+                  <input
+                    id={k}
+                    name={k}
+                    value={
+                      // @ts-expect-error Unsafe assignment
+                      // eslint-disable-next-line
+                      formState[k]!.url as string
+                    }
+                    onChange={(e) => {
+                      setFormState({
+                        ...formState,
+                        [k]: { type: "url", url: e.target.value },
+                      });
+                    }}
+                  />
+                </div>
+              )}
+              {formState[k]?.type === "date" && (
+                <div>
+                  <label htmlFor={k} className="block">
+                    {k}
+                  </label>
+                  <input
+                    type="date"
+                    id={k}
+                    name={k}
+                    value={
+                      // @ts-expect-error Unsafe assignment
+                      // eslint-disable-next-line
+                      formState[k].data.start
+                    }
+                    onChange={(e) =>
+                      setFormState({
+                        ...formState,
+                        [k]: { type: "date", data: { start: e.target.value } },
+                      })
+                    }
+                  />
+                </div>
+              )}
+              {formState[k]!.type === "multi_select" && (
+                <div>
+                  <select
+                    id={k}
+                    name={k}
+                    onChange={(e) => {
+                      setFormState({
+                        ...formState,
+                        [k]: {
+                          type: "multi_select",
+                          multi_select: [{ name: e.target.value }],
+                        },
+                      });
+                    }}
+                  >
+                    {
+                      // @ts-expect-error Unsafe assignment
+                      // eslint-disable-next-line
+                      data.formStructure[k].multi_select!.options!.map(
+                        (opt: MultiSelectOption) => (
+                          <option>{opt.name}</option>
+                        ),
+                      )
+                    }
+                  </select>
+                </div>
+              )}
+              {formState[k]!.type === "title" && (
+                <div>
+                  <label htmlFor={k} className="block">
+                    {k}
+                  </label>
+                  <input
+                    type="text"
+                    id={k}
+                    name={k}
+                    value={
+                      // @ts-expect-error Unsafe assignment
+                      // eslint-disable-next-line
+                      formState[k].title[0].text.content
+                    }
+                    onChange={(e) => {
+                      setFormState({
+                        ...formState,
+                        [k]: {
+                          type: "title",
+                          title: [
+                            {
+                              type: "text",
+                              text: { content: e.target.value, link: null },
+                            },
+                          ],
+                        },
+                      });
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
         </form>
       </>
     );
