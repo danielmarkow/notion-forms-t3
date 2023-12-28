@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^0.3.6",
+    "@headlessui/react": "^1.7.17",
+    "@heroicons/react": "^2.1.1",
     "@hookform/resolvers": "^3.3.2",
     "@notionhq/client": "^2.2.14",
     "@planetscale/database": "^1.11.0",
