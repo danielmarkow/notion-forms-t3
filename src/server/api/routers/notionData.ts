@@ -120,6 +120,7 @@ export const notionDataRouter = createTRPCRouter({
             type: "database_id",
             database_id: notionCredentials.notionPageId,
           },
+          // @ts-expect-error Type not assignable
           properties: input.newPage,
         });
       } catch (error) {
