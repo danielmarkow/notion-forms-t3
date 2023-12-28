@@ -1,35 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MultiSelectOption } from "~/app/_types/database";
+import type { MultiSelectOption } from "~/app/_types/database";
 import { api } from "~/trpc/react";
-
-type NotionDate = {
-  type: "date";
-  data: {
-    start: string;
-  };
-};
-
-type NotionTitle = {
-  type: "title";
-  title: { type: "text"; text: { content: string; link: string | null } }[];
-};
-
-type NotionMultiSelect = {
-  type: "multi_select";
-  multi_select: { name: string }[] | null;
-};
-
-type NotionUrl = {
-  type: "url";
-  url: string;
-};
-
-type NotionPage = Record<
-  string,
-  NotionUrl | NotionTitle | NotionMultiSelect | NotionDate
->;
+import type {
+  NotionDate,
+  NotionTitle,
+  NotionMultiSelect,
+  NotionUrl,
+  NotionPage,
+} from "~/app/_types/newPage";
+import { notionPageSchema } from "~/app/_types/newPage";
 
 export default function NotionForm({ params }: { params: { formId: string } }) {
   const { data, isSuccess, isError } = api.notionData.getFormStructure.useQuery(
@@ -37,6 +18,8 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
       notionPageIdId: params.formId,
     },
   );
+
+  const newPageMut = api.notionData.addNotionDbPage.useMutation();
 
   const [formState, setFormState] = useState<NotionPage>();
   const generateNewPage = () => {
@@ -50,7 +33,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
       if (formStructure[k]!.type === "date") {
         newPage[k] = {
           type: formStructure[k]!.type,
-          data: { start: "" },
+          date: { start: "" },
         } as NotionDate;
       } else if (formStructure[k]!.type === "title") {
         newPage[k] = {
@@ -116,7 +99,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
                 </div>
               )}
               {formState[k]?.type === "date" && (
-                <div>
+                <div key={k}>
                   <label htmlFor={k} className="block">
                     {k}
                   </label>
@@ -127,19 +110,19 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
                     value={
                       // @ts-expect-error Unsafe assignment
                       // eslint-disable-next-line
-                      formState[k].data.start
+                      formState[k].date.start
                     }
                     onChange={(e) =>
                       setFormState({
                         ...formState,
-                        [k]: { type: "date", data: { start: e.target.value } },
+                        [k]: { type: "date", date: { start: e.target.value } },
                       })
                     }
                   />
                 </div>
               )}
               {formState[k]!.type === "multi_select" && (
-                <div>
+                <div key={k}>
                   <select
                     id={k}
                     name={k}
@@ -158,7 +141,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
                       // eslint-disable-next-line
                       data.formStructure[k].multi_select!.options!.map(
                         (opt: MultiSelectOption) => (
-                          <option>{opt.name}</option>
+                          <option key={opt.id}>{opt.name}</option>
                         ),
                       )
                     }
@@ -166,7 +149,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
                 </div>
               )}
               {formState[k]!.type === "title" && (
-                <div>
+                <div key={k}>
                   <label htmlFor={k} className="block">
                     {k}
                   </label>
@@ -198,9 +181,32 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
               )}
             </div>
           ))}
+          <button
+            type="button"
+            onClick={() => {
+              newPageMut
+                .mutateAsync({
+                  notionPageIdId: params.formId,
+                  newPage: notionPageSchema.parse(formState),
+                })
+                .then(() => setFormState(generateNewPage()))
+                .catch((err) => console.error(err));
+            }}
+          >
+            Save
+          </button>
         </form>
       </>
     );
 
-  if (isError) return <p>An error occurred fetching data</p>;
+  if (isError) return <p>An error occurred fetching Notion data</p>;
 }
+
+//   newPageMut
+//     .mutateAsync({
+//       notionPageIdId: params.formId,
+//       newPage: notionPageSchema.parse(formState),
+//     })
+//     .then(() => setFormState(generateNewPage()))
+//     .catch((err) => console.error(err))
+// }

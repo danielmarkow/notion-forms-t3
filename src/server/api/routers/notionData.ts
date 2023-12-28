@@ -1,12 +1,14 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import crypto from "node:crypto";
-import { db } from "~/server/db";
-import { notionApiKeys, notionPageIds } from "~/server/db/schema";
 import { and, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { Client } from "@notionhq/client";
+
+import { db } from "~/server/db";
+import { notionApiKeys, notionPageIds } from "~/server/db/schema";
 import type { Database } from "~/app/_types/database";
+import { notionPageSchema } from "~/app/_types/newPage";
 
 function decrypt(
   encrypted: string,
@@ -99,5 +101,32 @@ export const notionDataRouter = createTRPCRouter({
       const formStructure = notionDb.properties;
 
       return { dbInfo, formStructure };
+    }),
+  addNotionDbPage: protectedProcedure
+    .input(z.object({ notionPageIdId: z.string(), newPage: notionPageSchema }))
+    .mutation(async ({ ctx, input }) => {
+      const notionCredentials = await getNotionCredentials(
+        input.notionPageIdId,
+        ctx.session.user.id,
+      );
+
+      const notion = new Client({
+        auth: notionCredentials.notionApiKey,
+      });
+
+      try {
+        await notion.pages.create({
+          parent: {
+            type: "database_id",
+            database_id: notionCredentials.notionPageId,
+          },
+          properties: input.newPage,
+        });
+      } catch (error) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Error saving new Notion page",
+        });
+      }
     }),
 });
