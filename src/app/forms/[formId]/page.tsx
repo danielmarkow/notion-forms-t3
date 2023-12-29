@@ -13,11 +13,10 @@ import type {
 import { notionPageSchema } from "~/app/_types/newPage";
 
 export default function NotionForm({ params }: { params: { formId: string } }) {
-  const { data, isSuccess, isError } = api.notionData.getFormStructure.useQuery(
-    {
+  const { data, isSuccess, isError, isLoading } =
+    api.notionData.getFormStructure.useQuery({
       notionPageIdId: params.formId,
-    },
-  );
+    });
 
   const newPageMut = api.notionData.addNotionDbPage.useMutation();
 
@@ -61,152 +60,171 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
     }
   }, [data]);
 
+  if (isError)
+    return (
+      <p className="text-sm font-medium text-gray-600">
+        An error occurred fetching Notion data
+      </p>
+    );
+
+  if (isLoading)
+    return <p className="text-sm font-medium text-gray-600">Loading...</p>;
+
   if (isSuccess && formState !== undefined)
     return (
       <>
-        <p>form id: {params.formId}</p>
-        {/* <p>{JSON.stringify(data.formStructure.Tags.multi_select.options)}</p> */}
-        {/* <p>
-          {Object.keys(data.formStructure).map((k) => (
-            <p>{JSON.stringify(data.formStructure[k])}</p>
-          ))}
-        </p> */}
+        {/* <p>{JSON.stringify(data)}</p> */}
         {/* <p>{JSON.stringify(formState)}</p> */}
-        <p>{JSON.stringify(formState)}</p>
-        <form>
-          {Object.keys(formState).map((k) => (
-            <div key={k}>
-              {formState[k]?.type === "url" && (
-                <div>
-                  <label htmlFor={k} className="block">
-                    {k}
-                  </label>
-                  <input
-                    id={k}
-                    name={k}
-                    value={
-                      // @ts-expect-error Unsafe assignment
-                      // eslint-disable-next-line
-                      formState[k]!.url as string
-                    }
-                    onChange={(e) => {
-                      setFormState({
-                        ...formState,
-                        [k]: { type: "url", url: e.target.value },
-                      });
-                    }}
-                  />
-                </div>
-              )}
-              {formState[k]?.type === "date" && (
+        <h1 className="text-sm font-medium">{data.dbInfo[0]!.text.content}</h1>
+        <div className="h-5" />
+        <div className="flex justify-center">
+          <form className="w-2/3 font-thin">
+            <div className="flex flex-col gap-y-3">
+              {Object.keys(formState).map((k) => (
                 <div key={k}>
-                  <label htmlFor={k} className="block">
-                    {k}
-                  </label>
-                  <input
-                    type="date"
-                    id={k}
-                    name={k}
-                    value={
-                      // @ts-expect-error Unsafe assignment
-                      // eslint-disable-next-line
-                      formState[k].date.start
-                    }
-                    onChange={(e) =>
-                      setFormState({
-                        ...formState,
-                        [k]: { type: "date", date: { start: e.target.value } },
-                      })
-                    }
-                  />
-                </div>
-              )}
-              {formState[k]!.type === "multi_select" && (
-                <div key={k}>
-                  <select
-                    id={k}
-                    name={k}
-                    onChange={(e) => {
-                      setFormState({
-                        ...formState,
-                        [k]: {
-                          type: "multi_select",
-                          multi_select: [{ name: e.target.value }],
-                        },
-                      });
-                    }}
-                  >
-                    {
-                      // @ts-expect-error Unsafe assignment
-                      // eslint-disable-next-line
-                      data.formStructure[k].multi_select!.options!.map(
-                        (opt: MultiSelectOption) => (
-                          <option key={opt.id}>{opt.name}</option>
-                        ),
-                      )
-                    }
-                  </select>
-                </div>
-              )}
-              {formState[k]!.type === "title" && (
-                <div key={k}>
-                  <label htmlFor={k} className="block">
-                    {k}
-                  </label>
-                  <input
-                    type="text"
-                    id={k}
-                    name={k}
-                    value={
-                      // @ts-expect-error Unsafe assignment
-                      // eslint-disable-next-line
-                      formState[k].title[0].text.content
-                    }
-                    onChange={(e) => {
-                      setFormState({
-                        ...formState,
-                        [k]: {
-                          type: "title",
-                          title: [
-                            {
-                              type: "text",
-                              text: { content: e.target.value, link: null },
+                  {formState[k]?.type === "url" && (
+                    <div>
+                      <label htmlFor={k} className="block text-sm">
+                        {k}
+                      </label>
+                      <input
+                        id={k}
+                        name={k}
+                        value={
+                          // @ts-expect-error Unsafe assignment
+                          // eslint-disable-next-line
+                          formState[k]!.url as string
+                        }
+                        onChange={(e) => {
+                          setFormState({
+                            ...formState,
+                            [k]: { type: "url", url: e.target.value },
+                          });
+                        }}
+                        className="w-full border border-gray-300 p-0.5"
+                      />
+                    </div>
+                  )}
+                  {formState[k]?.type === "date" && (
+                    <div key={k}>
+                      <label htmlFor={k} className="block text-sm">
+                        {k}
+                      </label>
+                      <input
+                        type="date"
+                        id={k}
+                        name={k}
+                        value={
+                          // @ts-expect-error Unsafe assignment
+                          // eslint-disable-next-line
+                          formState[k].date.start
+                        }
+                        onChange={(e) =>
+                          setFormState({
+                            ...formState,
+                            [k]: {
+                              type: "date",
+                              date: { start: e.target.value },
                             },
-                          ],
-                        },
-                      });
-                    }}
-                  />
+                          })
+                        }
+                        className="w-full border border-gray-300 p-0.5"
+                      />
+                    </div>
+                  )}
+                  {formState[k]!.type === "multi_select" && (
+                    <div key={k}>
+                      <label htmlFor={k} className="block text-sm">
+                        {k}
+                      </label>
+                      <select
+                        id={k}
+                        name={k}
+                        onChange={(e) => {
+                          setFormState({
+                            ...formState,
+                            [k]: {
+                              type: "multi_select",
+                              multi_select: [{ name: e.target.value }],
+                            },
+                          });
+                        }}
+                        className="w-full border border-gray-300 p-0.5"
+                      >
+                        {
+                          // @ts-expect-error Unsafe assignment
+                          // eslint-disable-next-line
+                          data.formStructure[k].multi_select!.options!.map(
+                            (opt: MultiSelectOption) => (
+                              <option key={opt.id}>{opt.name}</option>
+                            ),
+                          )
+                        }
+                      </select>
+                    </div>
+                  )}
+                  {formState[k]!.type === "title" && (
+                    <div key={k}>
+                      <label htmlFor={k} className="block text-sm">
+                        {k}
+                      </label>
+                      <input
+                        type="text"
+                        id={k}
+                        name={k}
+                        value={
+                          // @ts-expect-error Unsafe assignment
+                          // eslint-disable-next-line
+                          formState[k].title[0].text.content
+                        }
+                        onChange={(e) => {
+                          setFormState({
+                            ...formState,
+                            [k]: {
+                              type: "title",
+                              title: [
+                                {
+                                  type: "text",
+                                  text: { content: e.target.value, link: null },
+                                },
+                              ],
+                            },
+                          });
+                        }}
+                        className="w-full border border-gray-300 p-0.5"
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => {
-              newPageMut
-                .mutateAsync({
-                  notionPageIdId: params.formId,
-                  newPage: notionPageSchema.parse(formState),
-                })
-                .then(() => setFormState(generateNewPage()))
-                .catch((err) => console.error(err));
-            }}
-          >
-            Save
-          </button>
-        </form>
+            <div className="h-5" />
+            <button
+              type="button"
+              onClick={() => {
+                newPageMut
+                  .mutateAsync({
+                    notionPageIdId: params.formId,
+                    newPage: notionPageSchema.parse(formState),
+                  })
+                  .then(() => setFormState(generateNewPage()))
+                  .catch((err) => console.error(err));
+              }}
+              className="border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-200"
+            >
+              Save
+            </button>
+          </form>
+        </div>
+        <div className="h-5" />
+        <div className="flex justify-center">
+          {data.creatorEmail != "" && (
+            <footer className="text-sm font-thin text-gray-300">
+              created by{" "}
+              <a href={`mailto:${data.creatorEmail}`}>{data.creatorEmail}</a>
+            </footer>
+          )}
+        </div>
       </>
     );
-
-  if (isError) return <p>An error occurred fetching Notion data</p>;
 }
-
-//   newPageMut
-//     .mutateAsync({
-//       notionPageIdId: params.formId,
-//       newPage: notionPageSchema.parse(formState),
-//     })
-//     .then(() => setFormState(generateNewPage()))
-//     .catch((err) => console.error(err))
-// }
