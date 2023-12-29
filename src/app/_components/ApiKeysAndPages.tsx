@@ -20,11 +20,11 @@ export default function ApiKeysAndPageIds({
   return (
     <div className="w-full px-4 pt-16">
       <div className="mx-auto w-full max-w-md bg-white p-2">
-        <Disclosure>
+        <Disclosure defaultOpen={true}>
           {({ open }) => (
             <>
               <Disclosure.Button className="flex w-full justify-between px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring ">
-                <span>API Key Name: {conf.notionApiKeyName}</span>
+                <span>Notion API Key Name: {conf.notionApiKeyName}</span>
                 <ChevronUpIcon
                   className={`${open ? "rotate-180 transform" : ""} h-5 w-5`}
                 />

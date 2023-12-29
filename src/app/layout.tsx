@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className={`font-sans ${inter.variable}`}>
         <TRPCReactProvider cookies={cookies().toString()}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {children}
+            <div className="mx-auto max-w-3xl">{children}</div>
           </div>
         </TRPCReactProvider>
       </body>
