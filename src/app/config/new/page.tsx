@@ -4,6 +4,7 @@ import { useForm, type FieldValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "~/trpc/react";
+import Link from "next/link";
 
 const newCredentialsSchema = z.object({
   notionApiKey: z.string(),
@@ -36,8 +37,9 @@ export default function NewCredentials() {
   return (
     <>
       <h1 className="text-sm font-medium">New Notion Credentials</h1>
+      <div className="h-5" />
       <div className="flex justify-center">
-        <form onSubmit={handleSubmit(submit)} className="font-thin">
+        <form onSubmit={handleSubmit(submit)} className="w-2/3 font-thin">
           <div>
             <label htmlFor="notionApiKey" className="block text-sm">
               Notion API Key
@@ -46,7 +48,7 @@ export default function NewCredentials() {
               type="text"
               id="notionApiKey"
               {...register("notionApiKey")}
-              className="border border-gray-300 p-0.5"
+              className="w-full border border-gray-300 p-0.5"
             />
             {errors && (
               <p className="mt-2 text-sm text-red-600" id="notionApiKey-error">
@@ -63,7 +65,7 @@ export default function NewCredentials() {
             <input
               type="text"
               id="notionApiKeyName"
-              className="border border-gray-300 p-0.5"
+              className="w-full border border-gray-300 p-0.5"
               {...register("notionApiKeyName")}
             />
             {errors && (
@@ -83,7 +85,7 @@ export default function NewCredentials() {
               type="text"
               id="notionPageId"
               {...register("notionPageId")}
-              className="border border-gray-300 p-0.5"
+              className="w-full border border-gray-300 p-0.5"
             />
             {errors && (
               <p className="mt-2 text-sm text-red-600" id="notionPageId-error">
@@ -101,7 +103,7 @@ export default function NewCredentials() {
               type="text"
               id="notionDbName"
               {...register("notionDbName")}
-              className="border border-gray-300 p-0.5"
+              className="w-full border border-gray-300 p-0.5"
             />
             {errors && (
               <p
@@ -112,12 +114,23 @@ export default function NewCredentials() {
               </p>
             )}
           </div>
-          <button
-            type="submit"
-            className="border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-200"
-          >
-            {addNotionCredentialsMut.isLoading ? "Saving..." : "Save"}
-          </button>
+          <div className="h-5" />
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-200"
+            >
+              {addNotionCredentialsMut.isLoading ? "Saving..." : "Save"}
+            </button>
+            <Link href="/config">
+              <button
+                type="submit"
+                className="border border-red-300 bg-red-100 px-2 py-0.5 text-sm hover:bg-red-200"
+              >
+                Abort
+              </button>
+            </Link>
+          </div>
         </form>
       </div>
     </>

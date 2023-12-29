@@ -62,7 +62,7 @@ export default function AddPageToApiKey({
         <label htmlFor="notionDbName" className="block text-sm">
           Notion DB Name
           <div />
-          <span className="text-xs text-gray-500">*Choose freely</span>
+          <span className="text-xs text-gray-500">Choose freely</span>
         </label>
         <input
           type="text"

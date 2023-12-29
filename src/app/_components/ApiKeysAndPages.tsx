@@ -48,7 +48,7 @@ export default function ApiKeysAndPageIds({
                 </Disclosure.Panel>
               ))}
               <Disclosure.Panel className="mt-0.5 border-b-2 border-gray-100 px-4 pb-2 pt-4 font-thin text-gray-900">
-                <h1>Add new Page ID (Notion DB reference)</h1>
+                <h1>Add new Page ID (Notion DB reference) to this API key</h1>
                 <div className="h-2" />
                 <AddPageToApiKey notionApiKeyId={conf.id} />
               </Disclosure.Panel>

@@ -1,7 +1,5 @@
+import { redirect } from "next/navigation";
+
 export default function YourForms() {
-  return (
-    <>
-      <p>your forms</p>
-    </>
-  );
+  redirect("/config");
 }
