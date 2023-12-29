@@ -1,7 +1,7 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
-import AddPageToApiKey from "./add-page-to-api-key-form";
+import AddPageToApiKey from "./AddPageToApiKey";
 
 export default function ApiKeysAndPageIds({
   conf,
