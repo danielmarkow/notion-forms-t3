@@ -27,7 +27,14 @@ export default function AddPageToApiKey({
     resolver: zodResolver(newPageId),
   });
 
-  const addPageIdMut = api.notionConfig.addNotionPageId.useMutation();
+  const utils = api.useUtils();
+
+  const addPageIdMut = api.notionConfig.addNotionPageId.useMutation({
+    onSuccess: async () => {
+      await utils.notionConfig.getNotionApiKeysAndPageIds.invalidate();
+      reset();
+    },
+  });
 
   const onSubmit = (data: FieldValues) => {
     addPageIdMut.mutate({ notionApiKeyId, ...data } as NewPageIdMutInput);
@@ -36,18 +43,45 @@ export default function AddPageToApiKey({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label htmlFor="notionPageId" className="block">
+        <label htmlFor="notionPageId" className="block text-sm">
           Notion DB Page ID
         </label>
-        <input type="text" id="notionPageId" {...register("notionPageId")} />
+        <input
+          type="text"
+          id="notionPageId"
+          {...register("notionPageId")}
+          className="border border-gray-300 p-0.5"
+        />
+        {errors && (
+          <p className="mt-2 text-sm text-red-600" id="notionPageId-error">
+            {errors.notionPageId?.message}
+          </p>
+        )}
       </div>
       <div>
-        <label htmlFor="notionDbName" className="block">
+        <label htmlFor="notionDbName" className="block text-sm">
           Notion DB Name
+          <div />
+          <span className="text-xs text-gray-500">*Choose freely</span>
         </label>
-        <input type="text" id="notionDbName" {...register("notionDbName")} />
+        <input
+          type="text"
+          id="notionDbName"
+          {...register("notionDbName")}
+          className="border border-gray-300 p-0.5"
+        />
+        {errors && (
+          <p className="mt-2 text-sm text-red-600" id="notionDbName-error">
+            {errors.notionDbName?.message}
+          </p>
+        )}
       </div>
-      <button type="submit">Save</button>
+      <button
+        type="submit"
+        className="border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-200"
+      >
+        {addPageIdMut.isLoading ? "Saving..." : "Save"}
+      </button>
     </form>
   );
 }
