@@ -35,70 +35,91 @@ export default function NewCredentials() {
 
   return (
     <>
-      <p>New Notion Credentials</p>
-      <form onSubmit={handleSubmit(submit)}>
-        <div>
-          <label htmlFor="notionApiKey" className="block">
-            Notion API Key
-          </label>
-          <input type="text" id="notionApiKey" {...register("notionApiKey")} />
-          {errors && (
-            <p
-              className="mt-2 text-sm text-red-600"
-              id="link-notionApiKey-error"
-            >
-              {errors.notionApiKey?.message}
-            </p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="notionApiKeyName" className="block">
-            Notion API Key Name
-          </label>
-          <input
-            type="text"
-            id="notionApiKeyName"
-            {...register("notionApiKeyName")}
-          />
-          {errors && (
-            <p
-              className="mt-2 text-sm text-red-600"
-              id="link-notionApiKeyName-error"
-            >
-              {errors.notionApiKeyName?.message}
-            </p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="notionPageId" className="block">
-            Notion DB Page ID
-          </label>
-          <input type="text" id="notionPageId" {...register("notionPageId")} />
-          {errors && (
-            <p
-              className="mt-2 text-sm text-red-600"
-              id="link-notionPageId-error"
-            >
-              {errors.notionPageId?.message}
-            </p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="notionDbName" className="block">
-            Notion DB Name
-          </label>
-          <input type="text" id="notionDbName" {...register("notionDbName")} />
-          {errors && (
-            <p
-              className="mt-2 text-sm text-red-600"
-              id="link-notionDbName-error"
-            >
-              {errors.notionDbName?.message}
-            </p>
-          )}
-        </div>
-        <button type="submit">Save</button>
-      </form>
+      <h1 className="text-sm font-medium">New Notion Credentials</h1>
+      <div className="flex justify-center">
+        <form onSubmit={handleSubmit(submit)} className="font-thin">
+          <div>
+            <label htmlFor="notionApiKey" className="block text-sm">
+              Notion API Key
+            </label>
+            <input
+              type="text"
+              id="notionApiKey"
+              {...register("notionApiKey")}
+              className="border border-gray-300 p-0.5"
+            />
+            {errors && (
+              <p className="mt-2 text-sm text-red-600" id="notionApiKey-error">
+                {errors.notionApiKey?.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label htmlFor="notionApiKeyName" className="block text-sm">
+              Notion API Key Name
+              <div />
+              <span className="text-xs text-gray-500">Choose freely</span>
+            </label>
+            <input
+              type="text"
+              id="notionApiKeyName"
+              className="border border-gray-300 p-0.5"
+              {...register("notionApiKeyName")}
+            />
+            {errors && (
+              <p
+                className="mt-2 text-sm text-red-600"
+                id="notionApiKeyName-error"
+              >
+                {errors.notionApiKeyName?.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label htmlFor="notionPageId" className="block text-sm">
+              Notion DB Page ID
+            </label>
+            <input
+              type="text"
+              id="notionPageId"
+              {...register("notionPageId")}
+              className="border border-gray-300 p-0.5"
+            />
+            {errors && (
+              <p className="mt-2 text-sm text-red-600" id="notionPageId-error">
+                {errors.notionPageId?.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label htmlFor="notionDbName" className="block text-sm">
+              Notion DB Name
+              <div />
+              <span className="text-xs text-gray-500">Choose freely</span>
+            </label>
+            <input
+              type="text"
+              id="notionDbName"
+              {...register("notionDbName")}
+              className="border border-gray-300 p-0.5"
+            />
+            {errors && (
+              <p
+                className="mt-2 text-sm text-red-600"
+                id="link-notionDbName-error"
+              >
+                {errors.notionDbName?.message}
+              </p>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-200"
+          >
+            {addNotionCredentialsMut.isLoading ? "Saving..." : "Save"}
+          </button>
+        </form>
+      </div>
     </>
   );
 }

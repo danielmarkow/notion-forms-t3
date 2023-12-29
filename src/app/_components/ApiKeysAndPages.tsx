@@ -37,7 +37,12 @@ export default function ApiKeysAndPageIds({
                   <div className="flex justify-between">
                     <div>Page ID Name: {page.notionDbName}</div>
                     <div>
-                      <Link href={`/forms/${page.id}`}>go to form</Link>
+                      <Link
+                        href={`/forms/${page.id}`}
+                        className="hover:underline hover:underline-offset-8"
+                      >
+                        go to form
+                      </Link>
                     </div>
                   </div>
                 </Disclosure.Panel>
