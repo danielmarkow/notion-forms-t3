@@ -78,7 +78,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
         <h1 className="text-sm font-medium">{data.dbInfo[0]!.text.content}</h1>
         <div className="h-5" />
         <div className="flex justify-center">
-          <form className="w-2/3 font-thin">
+          <form className="w-2/3 text-sm">
             <div className="flex flex-col gap-y-3">
               {Object.keys(formState).map((k) => (
                 <div key={k}>
@@ -219,7 +219,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
         <div className="h-5" />
         <div className="flex justify-center">
           {data.creatorEmail != "" && (
-            <footer className="text-sm font-thin text-gray-300">
+            <footer className="text-sm text-sm text-gray-500">
               created by{" "}
               <a href={`mailto:${data.creatorEmail}`}>{data.creatorEmail}</a>
             </footer>

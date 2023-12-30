@@ -39,7 +39,7 @@ export default function NewCredentials() {
       <h1 className="text-sm font-medium">New Notion Credentials</h1>
       <div className="h-5" />
       <div className="flex justify-center">
-        <form onSubmit={handleSubmit(submit)} className="w-2/3 font-thin">
+        <form onSubmit={handleSubmit(submit)} className="w-2/3 text-sm">
           <div>
             <label htmlFor="notionApiKey" className="block text-sm">
               Notion API Key

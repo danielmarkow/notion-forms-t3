@@ -31,7 +31,7 @@ export default function ApiKeysAndPageIds({
               </Disclosure.Button>
               {conf.pageIds.map((page) => (
                 <Disclosure.Panel
-                  className="mt-0.5 border-b-2 border-gray-100 px-4 pb-2 pt-4 font-thin text-gray-900"
+                  className="mt-0.5 border-b-2 border-gray-100 px-4 pb-2 pt-4 text-sm text-gray-900"
                   key={page.id}
                 >
                   <div className="flex justify-between">
@@ -47,7 +47,7 @@ export default function ApiKeysAndPageIds({
                   </div>
                 </Disclosure.Panel>
               ))}
-              <Disclosure.Panel className="mt-0.5 border-b-2 border-gray-100 px-4 pb-2 pt-4 font-thin text-gray-900">
+              <Disclosure.Panel className="mt-0.5 border-b-2 border-gray-100 px-4 pb-2 pt-4 text-sm text-gray-900">
                 <h1>Add new Page ID (Notion DB reference) to this API key</h1>
                 <div className="h-2" />
                 <AddPageToApiKey notionApiKeyId={conf.id} />
