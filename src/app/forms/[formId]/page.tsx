@@ -10,6 +10,7 @@ import type {
   NotionUrl,
   NotionPage,
   NotionCheckbox,
+  NotionEmail,
 } from "~/app/_types/newPage";
 import { notionPageSchema } from "~/app/_types/newPage";
 
@@ -55,6 +56,11 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
           type: "checkbox",
           checkbox: false,
         } as NotionCheckbox;
+      } else if (formStructure[k]!.type === "email") {
+        newPage[k] = {
+          type: "email",
+          email: "",
+        } as NotionEmail;
       }
     }
     return newPage;
@@ -228,7 +234,34 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
                               type: "checkbox",
                               // @ts-expect-error Unsafe assignment
                               // eslint-disable-next-line
-                              checkbox: !formState[k]!.checkbox,
+                              checkbox: !formState[k].checkbox,
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  )}
+                  {formState[k]!.type === "email" && (
+                    <div key={k}>
+                      <label htmlFor={k} className="block text-sm">
+                        {k}
+                      </label>
+                      <input
+                        type="email"
+                        id={k}
+                        name={k}
+                        className="w-full border border-gray-300 p-0.5"
+                        value={
+                          // @ts-expect-error Unsafe assignment
+                          // eslint-disable-next-line
+                          formState[k].email as string
+                        }
+                        onChange={(e) =>
+                          setFormState({
+                            ...formState,
+                            [k]: {
+                              type: "email",
+                              email: e.target.value,
                             },
                           })
                         }

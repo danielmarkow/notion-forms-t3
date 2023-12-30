@@ -62,12 +62,20 @@ export const notionCheckboxSchema = z.object({
 
 export type NotionCheckbox = z.infer<typeof notionCheckboxSchema>;
 
+export const notionEmailSchema = z.object({
+  type: z.literal("email"),
+  email: z.string().email(),
+});
+
+export type NotionEmail = z.infer<typeof notionEmailSchema>;
+
 export const notionPageSchema = z.record(
   notionDateSchema
     .or(notionTitleSchema)
     .or(notionMultiSelectSchema)
     .or(notionUrlSchema)
-    .or(notionCheckboxSchema),
+    .or(notionCheckboxSchema)
+    .or(notionEmailSchema),
 );
 
 export type NotionPage = z.infer<typeof notionPageSchema>;
