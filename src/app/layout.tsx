@@ -5,6 +5,8 @@ import { cookies } from "next/headers";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
+import { Analytics } from "@vercel/analytics/react";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -26,7 +28,10 @@ export default function RootLayout({
       <body className={`font-sans ${inter.variable}`}>
         <TRPCReactProvider cookies={cookies().toString()}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl">{children}</div>
+            <div className="mx-auto max-w-3xl">
+              {children}
+              <Analytics />
+            </div>
           </div>
         </TRPCReactProvider>
       </body>
