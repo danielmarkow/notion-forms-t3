@@ -23,16 +23,14 @@ export default function ConfigNotion() {
   if (notionConfigQry.isSuccess)
     return (
       <>
-        {notionConfigQry.data.length > 0 &&
-          notionConfigQry.data.map((conf) => (
-            <div key={conf.id}>
-              <ApiKeysAndPageIds conf={conf} />
-            </div>
-          ))}
-        {notionConfigQry.data.length === 0 && (
+        {notionConfigQry.data.length > 0 && (
           <>
-            <p>No Notion API keys configured yet</p>
-            <p>Click to add one</p>
+            <div className="h-10" />
+            {notionConfigQry.data.map((conf) => (
+              <div key={conf.id}>
+                <ApiKeysAndPageIds conf={conf} />
+              </div>
+            ))}
             <div className="h-2" />
             <div className="flex justify-center">
               <Link href="/config/new">
@@ -46,17 +44,24 @@ export default function ConfigNotion() {
             </div>
           </>
         )}
-        <div className="h-2" />
-        <div className="flex justify-center">
-          <Link href="/config/new">
-            <button
-              type="button"
-              className="border border-gray-300 px-2 py-0.5 text-sm font-thin text-gray-900 hover:bg-gray-200"
-            >
-              Add new Notion API key
-            </button>
-          </Link>
-        </div>
+        {notionConfigQry.data.length === 0 && (
+          <>
+            <div className="h-5" />
+            <p className="text-sm">No Notion API keys configured yet</p>
+            <p className="text-sm">Click to add one</p>
+            <div className="h-2" />
+            <div className="flex justify-center">
+              <Link href="/config/new">
+                <button
+                  type="button"
+                  className="border border-gray-300 px-2 py-0.5 text-sm font-thin text-gray-900 hover:bg-gray-200"
+                >
+                  Add new Notion API key
+                </button>
+              </Link>
+            </div>
+          </>
+        )}
       </>
     );
 }

@@ -56,6 +56,7 @@ export const notionConfigRouter = createTRPCRouter({
           ),
           notionDbName: input.notionDbName,
           notionApiKeyId: notionApiKeyId,
+          public: false,
         });
       } catch (error) {
         throw new TRPCError({
@@ -117,6 +118,7 @@ export const notionConfigRouter = createTRPCRouter({
         ),
         notionDbName: input.notionDbName,
         notionApiKeyId: input.notionApiKeyId,
+        public: false,
       });
     }),
 });
