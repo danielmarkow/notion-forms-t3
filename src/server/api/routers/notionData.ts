@@ -99,8 +99,14 @@ export const notionDataRouter = createTRPCRouter({
 
       const dbInfo = notionDb.description;
       const formStructure = notionDb.properties;
+      const dbTitle = notionDb.title;
 
-      return { dbInfo, formStructure, creatorEmail: ctx.session.user.email };
+      return {
+        dbInfo,
+        formStructure,
+        creatorEmail: ctx.session.user.email,
+        dbTitle,
+      };
     }),
   addNotionDbPage: protectedProcedure
     .input(z.object({ notionPageIdId: z.string(), newPage: notionPageSchema }))

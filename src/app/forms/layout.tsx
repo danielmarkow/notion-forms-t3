@@ -8,7 +8,7 @@ export default function FormLayout({
   return (
     <>
       <Link href="/config">
-        <h1 className="text-sm font-medium">Form</h1>
+        <h1 className="text-sm font-medium hover:underline">Form</h1>
       </Link>
       {children}
     </>

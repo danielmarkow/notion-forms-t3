@@ -39,7 +39,7 @@ export type Database = {
     href: null;
   }[];
   is_inline: boolean;
-  properties: Record<string, Date | MultiSelect | Title | URL>; // TODO add more properties
+  properties: Record<string, Date | MultiSelect | Title | URL | Checkbox>; // TODO add more properties
   parent: { type: string; workspace: boolean };
   url: string;
   public_url: string | null;
@@ -83,4 +83,11 @@ export type URL = {
   name: string;
   type: "url";
   url: object;
+};
+
+export type Checkbox = {
+  id: string;
+  name: string;
+  type: "checkbox";
+  checkbox: boolean;
 };

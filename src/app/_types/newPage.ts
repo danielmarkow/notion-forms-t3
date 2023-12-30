@@ -55,11 +55,19 @@ export const notionUrlSchema = z.object({
 
 export type NotionUrl = z.infer<typeof notionUrlSchema>;
 
+export const notionCheckboxSchema = z.object({
+  type: z.literal("checkbox"),
+  checkbox: z.boolean(),
+});
+
+export type NotionCheckbox = z.infer<typeof notionCheckboxSchema>;
+
 export const notionPageSchema = z.record(
   notionDateSchema
     .or(notionTitleSchema)
     .or(notionMultiSelectSchema)
-    .or(notionUrlSchema),
+    .or(notionUrlSchema)
+    .or(notionCheckboxSchema),
 );
 
 export type NotionPage = z.infer<typeof notionPageSchema>;

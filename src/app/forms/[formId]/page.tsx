@@ -9,6 +9,7 @@ import type {
   NotionMultiSelect,
   NotionUrl,
   NotionPage,
+  NotionCheckbox,
 } from "~/app/_types/newPage";
 import { notionPageSchema } from "~/app/_types/newPage";
 
@@ -49,6 +50,11 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
           type: "url",
           url: "",
         } as NotionUrl;
+      } else if (formStructure[k]!.type === "checkbox") {
+        newPage[k] = {
+          type: "checkbox",
+          checkbox: false,
+        } as NotionCheckbox;
       }
     }
     return newPage;
@@ -73,11 +79,15 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
   if (isSuccess && formState !== undefined)
     return (
       <>
-        {/* <p>{JSON.stringify(data)}</p> */}
-        {/* <p>{JSON.stringify(formState)}</p> */}
+        {/* <p>{JSON.stringify(data.formStructure)}</p> */}
+        {/* <p>{JSON.stringify(data.dbTitle)}</p> */}
+        <p>{JSON.stringify(formState)}</p>
         <h1 className="text-sm font-medium">
-          {data.dbInfo.length > 0 ? data.dbInfo[0]!.text.content : "Your From"}
+          {data.dbTitle.length > 0 && data.dbTitle[0]?.plain_text}
         </h1>
+        <h2 className="text-sm font-medium text-gray-600">
+          {data.dbInfo.length > 0 ? data.dbInfo[0]!.text.content : "Your Form"}
+        </h2>
         <div className="h-5" />
         <div className="flex justify-center">
           <form className="w-2/3 text-sm">
@@ -197,6 +207,34 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
                       />
                     </div>
                   )}
+                  {formState[k]!.type === "checkbox" && (
+                    <div key={k}>
+                      <label htmlFor={k} className="block text-sm">
+                        {k}
+                      </label>
+                      <input
+                        type="checkbox"
+                        id={k}
+                        name={k}
+                        checked={
+                          // @ts-expect-error Unsafe assignment
+                          // eslint-disable-next-line
+                          formState[k].checkbox
+                        }
+                        onChange={() =>
+                          setFormState({
+                            ...formState,
+                            [k]: {
+                              type: "checkbox",
+                              // @ts-expect-error Unsafe assignment
+                              // eslint-disable-next-line
+                              checkbox: !formState[k]!.checkbox,
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -214,7 +252,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
               }}
               className="border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-200"
             >
-              Save
+              {newPageMut.isLoading ? "Saving..." : "Save"}
             </button>
           </form>
         </div>
