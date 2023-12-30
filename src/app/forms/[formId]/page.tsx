@@ -75,7 +75,9 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
       <>
         {/* <p>{JSON.stringify(data)}</p> */}
         {/* <p>{JSON.stringify(formState)}</p> */}
-        <h1 className="text-sm font-medium">{data.dbInfo[0]!.text.content}</h1>
+        <h1 className="text-sm font-medium">
+          {data.dbInfo.length > 0 ? data.dbInfo[0]!.text.content : "Your From"}
+        </h1>
         <div className="h-5" />
         <div className="flex justify-center">
           <form className="w-2/3 text-sm">
@@ -219,7 +221,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
         <div className="h-5" />
         <div className="flex justify-center">
           {data.creatorEmail != "" && (
-            <footer className="text-sm text-sm text-gray-500">
+            <footer className="text-sm text-gray-500">
               created by{" "}
               <a href={`mailto:${data.creatorEmail}`}>{data.creatorEmail}</a>
             </footer>
