@@ -38,6 +38,8 @@ export default function ConfigNotion() {
           <>
             <div className="h-10" />
             <h1 className="text-sm">Your Notion API Keys</h1>
+            <div className="h-2" />
+
             {notionConfigQry.data.map((conf) => (
               <div
                 key={conf.id}
@@ -57,7 +59,7 @@ export default function ConfigNotion() {
                     {conf.pageIds.map((page) => (
                       <li key={page.id}>
                         <div className="flex justify-between border-b">
-                          <div className="pb-1">
+                          <div className="pb-1 pt-1">
                             <Link href={`/forms/${page.id}`}>
                               {page.notionDbName}{" "}
                               <span className="text-xs text-gray-500">
@@ -69,7 +71,7 @@ export default function ConfigNotion() {
                             </div>
                           </div>
 
-                          <div>
+                          <div className="pt-1">
                             <PageIdDropDown />
                           </div>
                         </div>
