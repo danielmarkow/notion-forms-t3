@@ -61,6 +61,21 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
           type: "email",
           email: "",
         } as NotionEmail;
+      } else if (formStructure[k]!.type === "rich_text") {
+        newPage[k] = {
+          type: "rich_text",
+          rich_text: [
+            {
+              type: "text",
+              text: {
+                content: "",
+                link: null,
+              },
+              plain_text: "",
+              href: null,
+            },
+          ],
+        };
       }
     }
     return newPage;
@@ -85,9 +100,9 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
   if (isSuccess && formState !== undefined)
     return (
       <>
-        {/* <p>{JSON.stringify(data.formStructure)}</p> */}
+        <p>{JSON.stringify(data.formStructure)}</p>
         {/* <p>{JSON.stringify(data.dbTitle)}</p> */}
-        {/* <p>{JSON.stringify(formState)}</p> */}
+        <p>{JSON.stringify(formState)}</p>
         <h1 className="text-sm font-medium">
           {data.dbTitle.length > 0 && data.dbTitle[0]?.plain_text}
         </h1>
@@ -262,6 +277,43 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
                             [k]: {
                               type: "email",
                               email: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  )}
+                  {formState[k]!.type === "rich_text" && (
+                    <div key={k}>
+                      <label htmlFor={k} className="block text-sm">
+                        {k}
+                      </label>
+                      <input
+                        type="text"
+                        id={k}
+                        name={k}
+                        className="w-full border border-gray-300 p-0.5"
+                        value={
+                          // @ts-expect-error Unsafe assignment
+                          // eslint-disable-next-line
+                          formState[k].rich_text[0].text.content
+                        }
+                        onChange={(e) =>
+                          setFormState({
+                            ...formState,
+                            [k]: {
+                              type: "rich_text",
+                              rich_text: [
+                                {
+                                  type: "text",
+                                  text: {
+                                    content: e.target.value,
+                                    link: null,
+                                  },
+                                  plain_text: e.target.value,
+                                  href: null,
+                                },
+                              ],
                             },
                           })
                         }

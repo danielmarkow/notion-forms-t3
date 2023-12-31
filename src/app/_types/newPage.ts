@@ -26,7 +26,7 @@ export const richTextItemRequest = z.object({
   }),
 });
 
-export type RichtTextItemRequest = z.infer<typeof richTextItemRequest>;
+export type RichTextItemRequest = z.infer<typeof richTextItemRequest>;
 
 export const notionTitleSchema = z.object({
   type: z.literal("title"),
@@ -69,13 +69,49 @@ export const notionEmailSchema = z.object({
 
 export type NotionEmail = z.infer<typeof notionEmailSchema>;
 
+export const notionRichTextSchema = z.object({
+  type: z.literal("rich_text"),
+  rich_text: z.array(
+    z.object({
+      type: z.literal("text"),
+      text: z.object({
+        content: z.string(),
+        link: z.string().nullable(),
+      }),
+      annotations: z
+        .object({
+          bold: z.boolean(),
+          italic: z.boolean(),
+          strikethrough: z.boolean(),
+          underline: z.boolean(),
+          code: z.boolean(),
+          color: z.string(),
+        })
+        .optional(),
+      plain_text: z.string(),
+      href: z.string().nullable(),
+    }),
+  ),
+});
+
+// export const notionRichTextSchema = z.object({
+//   type: z.literal("rich_text"),
+//   rich_text: z.object({
+//     content: z.string(),
+//     link: z.string().nullable(),
+//   }),
+// });
+
+export type RichText = z.infer<typeof notionRichTextSchema>;
+
 export const notionPageSchema = z.record(
   notionDateSchema
     .or(notionTitleSchema)
     .or(notionMultiSelectSchema)
     .or(notionUrlSchema)
     .or(notionCheckboxSchema)
-    .or(notionEmailSchema),
+    .or(notionEmailSchema)
+    .or(notionRichTextSchema),
 );
 
 export type NotionPage = z.infer<typeof notionPageSchema>;

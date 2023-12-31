@@ -41,7 +41,7 @@ export type Database = {
   is_inline: boolean;
   properties: Record<
     string,
-    Date | MultiSelect | Title | URL | Checkbox | Email
+    Date | MultiSelect | Title | URL | Checkbox | Email | RichText
   >; // TODO add more properties
   parent: { type: string; workspace: boolean };
   url: string;
@@ -100,3 +100,36 @@ export type Email = {
   type: "email";
   email: string;
 };
+
+export type RichText = {
+  id: string;
+  type: "rich_text";
+  rich_text: [
+    {
+      type: "text";
+      text: {
+        content: string;
+        link: string | null;
+      };
+      annotations: {
+        bold: boolean;
+        italic: boolean;
+        strikethrough: boolean;
+        underline: boolean;
+        code: boolean;
+        color: string;
+      };
+      plain_text: string;
+      href: string | null;
+    },
+  ];
+};
+
+// export type RichText = {
+//   id: string;
+//   type: "rich_text";
+//   rich_text: {
+//     content: string;
+//     link: string | null;
+//   };
+// };
