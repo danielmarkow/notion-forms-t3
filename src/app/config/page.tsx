@@ -2,14 +2,16 @@
 
 import { api } from "~/trpc/react";
 import Link from "next/link";
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   EllipsisVerticalIcon,
   ExclamationTriangleIcon,
   TrashIcon,
+  ChevronUpIcon,
 } from "@heroicons/react/20/solid";
 import { Fragment, useRef, useState } from "react";
 import { classNames } from "../_utils/cssUtils";
+import AddPageToApiKey from "../_components/AddPageToApiKey";
 
 export default function ConfigNotion() {
   const [openApiKeyDelWarning, setOpenApiKeyDelWarning] = useState(false);
@@ -39,10 +41,10 @@ export default function ConfigNotion() {
             {notionConfigQry.data.map((conf) => (
               <div
                 key={conf.id}
-                className="flex flex-col border-b border-gray-300 pb-2 pt-2"
+                className="flex flex-col border-b border-dashed border-gray-300 pb-2 pt-2"
               >
                 <div className="flex gap-x-1 align-middle">
-                  <h1 className="pb-1 text-sm font-medium">
+                  <h1 className="pb-2 text-sm font-medium">
                     {conf.notionApiKeyName}
                   </h1>
                   <TrashIcon
@@ -54,8 +56,8 @@ export default function ConfigNotion() {
                   <ul className="list-none text-sm">
                     {conf.pageIds.map((page) => (
                       <li key={page.id}>
-                        <div className="flex justify-between">
-                          <div>
+                        <div className="flex justify-between border-b">
+                          <div className="pb-1">
                             <Link href={`/forms/${page.id}`}>
                               {page.notionDbName}{" "}
                               <span className="text-xs text-gray-500">
@@ -80,6 +82,8 @@ export default function ConfigNotion() {
                   setOpen={setOpenApiKeyDelWarning}
                   notionApiKeyId={conf.id}
                 />
+                <AddPageIdToApiKeyDisclosure notionApiKeyId={conf.id} />
+                <div className="h-8" />
               </div>
             ))}
             <div className="h-2" />
@@ -168,6 +172,32 @@ function PageIdDropDown() {
         </Menu.Items>
       </Transition>
     </Menu>
+  );
+}
+
+function AddPageIdToApiKeyDisclosure({
+  notionApiKeyId,
+}: {
+  notionApiKeyId: string;
+}) {
+  return (
+    <Disclosure defaultOpen={false}>
+      {({ open }) => (
+        <>
+          <Disclosure.Button className="flex w-full justify-between px-2 text-sm focus:outline-none focus-visible:ring ">
+            <div className="flex items-center gap-x-1 align-middle">
+              <h1 className="text-sm">Add a Page ID to this API Key</h1>
+              <ChevronUpIcon
+                className={`${open ? "rotate-180 transform" : ""} h-5 w-5`}
+              />
+            </div>
+          </Disclosure.Button>
+          <Disclosure.Panel className="mt-0.5 px-4 pb-2 pt-2 text-sm text-gray-900">
+            <AddPageToApiKey notionApiKeyId={notionApiKeyId} />
+          </Disclosure.Panel>
+        </>
+      )}
+    </Disclosure>
   );
 }
 
