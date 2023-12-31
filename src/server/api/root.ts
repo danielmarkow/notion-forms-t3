@@ -1,6 +1,7 @@
 import { createTRPCRouter } from "~/server/api/trpc";
 import { notionConfigRouter } from "./routers/notionConfig";
 import { notionDataRouter } from "./routers/notionData";
+import { publicNotionDataRouter } from "./routers/publicNotionData";
 
 /**
  * This is the primary router for your server.
@@ -10,6 +11,7 @@ import { notionDataRouter } from "./routers/notionData";
 export const appRouter = createTRPCRouter({
   notionConfig: notionConfigRouter,
   notionData: notionDataRouter,
+  publicNotionData: publicNotionDataRouter,
 });
 
 // export type definition of API
