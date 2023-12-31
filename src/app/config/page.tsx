@@ -60,7 +60,13 @@ export default function ConfigNotion() {
                       <li key={page.id}>
                         <div className="flex justify-between border-b">
                           <div className="pb-1 pt-1">
-                            <Link href={`/forms/${page.id}`}>
+                            <Link
+                              href={
+                                page.public
+                                  ? `/public/forms/${page.id}`
+                                  : `/forms/${page.id}`
+                              }
+                            >
                               {page.notionDbName}{" "}
                               <span className="text-xs text-gray-500">
                                 click to visit form
@@ -166,7 +172,7 @@ function PageIdDropDown({
                   type="button"
                   className={classNames(
                     active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                    "block px-4 py-2 text-sm",
+                    "block w-full px-4 py-2 text-left text-sm",
                   )}
                   onClick={() =>
                     updatePageFormVisibilityMut.mutate({
@@ -185,7 +191,7 @@ function PageIdDropDown({
                   type="button"
                   className={classNames(
                     active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                    "block px-4 py-2 text-sm",
+                    "block w-full px-4 py-2 text-left text-sm",
                   )}
                 >
                   Delete form
