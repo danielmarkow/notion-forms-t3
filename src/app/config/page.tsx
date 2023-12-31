@@ -73,7 +73,7 @@ export default function ConfigNotion() {
 
                           <div className="pt-1">
                             <PageIdDropDown
-                              public={page.public}
+                              pagePublic={page.public}
                               notionPageIdId={page.id}
                             />
                           </div>
