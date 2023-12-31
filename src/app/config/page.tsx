@@ -2,12 +2,18 @@
 
 import { api } from "~/trpc/react";
 import Link from "next/link";
-import { Menu, Transition } from "@headlessui/react";
-import { EllipsisVerticalIcon, TrashIcon } from "@heroicons/react/20/solid";
-import { Fragment } from "react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
+import {
+  EllipsisVerticalIcon,
+  ExclamationTriangleIcon,
+  TrashIcon,
+} from "@heroicons/react/20/solid";
+import { Fragment, useRef, useState } from "react";
 import { classNames } from "../_utils/cssUtils";
 
 export default function ConfigNotion() {
+  const [openApiKeyDelWarning, setOpenApiKeyDelWarning] = useState(false);
+
   const notionConfigQry =
     api.notionConfig.getNotionApiKeysAndPageIds.useQuery();
 
@@ -33,18 +39,21 @@ export default function ConfigNotion() {
             {notionConfigQry.data.map((conf) => (
               <div
                 key={conf.id}
-                className="border-gray-300pb-2 flex flex-col border-b pt-2"
+                className="flex flex-col border-b border-gray-300 pb-2 pt-2"
               >
                 <div className="flex gap-x-1 align-middle">
                   <h1 className="pb-1 text-sm font-medium">
                     {conf.notionApiKeyName}
                   </h1>
-                  <TrashIcon className="h-5 w-5 text-gray-400" />
+                  <TrashIcon
+                    className="h-5 w-5 cursor-pointer text-gray-400"
+                    onClick={() => setOpenApiKeyDelWarning(true)}
+                  />
                 </div>
                 <div className="px-2 pb-1">
                   <ul className="list-none text-sm">
                     {conf.pageIds.map((page) => (
-                      <li>
+                      <li key={page.id}>
                         <div className="flex justify-between">
                           <div>
                             <Link href={`/forms/${page.id}`}>
@@ -66,7 +75,11 @@ export default function ConfigNotion() {
                     ))}
                   </ul>
                 </div>
-                {/* <ApiKeysAndPageIds conf={conf} /> */}
+                <ApiKeyDeletionWarning
+                  open={openApiKeyDelWarning}
+                  setOpen={setOpenApiKeyDelWarning}
+                  notionApiKeyId={conf.id}
+                />
               </div>
             ))}
             <div className="h-2" />
@@ -171,5 +184,110 @@ function PrivateBadge() {
     <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
       Private
     </span>
+  );
+}
+
+function ApiKeyDeletionWarning({
+  open,
+  setOpen,
+  notionApiKeyId,
+}: {
+  open: boolean;
+  setOpen: (arg: boolean) => void;
+  notionApiKeyId: string;
+}) {
+  const utils = api.useUtils();
+
+  const removeNotionApiKeyMut = api.notionConfig.removeNotionApiKey.useMutation(
+    {
+      onSuccess: async () => {
+        await utils.notionConfig.getNotionApiKeysAndPageIds.invalidate();
+        setOpen(false);
+      },
+    },
+  );
+
+  const cancelButtonRef = useRef(null);
+
+  return (
+    <Transition.Root show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        initialFocus={cancelButtonRef}
+        onClose={setOpen}
+      >
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enterTo="opacity-100 translate-y-0 sm:scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <div className="sm:flex sm:items-start">
+                  <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <ExclamationTriangleIcon
+                      className="h-6 w-6 text-red-600"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-base font-semibold leading-6 text-gray-900"
+                    >
+                      Delete Notion API Key
+                    </Dialog.Title>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        Are you sure you want to delete your Notion API key? All
+                        the associated Page IDs will be deleted as well. This
+                        action cannot be reversed!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                  <button
+                    type="button"
+                    className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                    onClick={() =>
+                      removeNotionApiKeyMut.mutate({ notionApiKeyId })
+                    }
+                  >
+                    Delete
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    onClick={() => setOpen(false)}
+                    ref={cancelButtonRef}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition.Root>
   );
 }
