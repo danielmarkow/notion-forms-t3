@@ -94,6 +94,7 @@ export const notionConfigRouter = createTRPCRouter({
             id: true,
             notionDbName: true,
             createdAt: true,
+            public: true,
           },
         },
       },
@@ -141,6 +142,27 @@ export const notionConfigRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Error deleting Notion API key",
+          cause: error,
+        });
+      }
+    }),
+  updatePageFormVisibility: protectedProcedure
+    .input(z.object({ public: z.boolean(), notionPageIdId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.db
+          .update(notionPageIds)
+          .set({ public: input.public })
+          .where(
+            and(
+              eq(notionPageIds.id, input.notionPageIdId),
+              eq(notionPageIds.createdById, ctx.session.user.id),
+            ),
+          );
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error updating page visibility",
           cause: error,
         });
       }

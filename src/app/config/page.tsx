@@ -67,12 +67,15 @@ export default function ConfigNotion() {
                               </span>
                             </Link>
                             <div className="pt-1">
-                              <PrivateBadge />
+                              {page.public ? <PublicBadge /> : <PrivateBadge />}
                             </div>
                           </div>
 
                           <div className="pt-1">
-                            <PageIdDropDown />
+                            <PageIdDropDown
+                              public={page.public}
+                              notionPageIdId={page.id}
+                            />
                           </div>
                         </div>
                       </li>
@@ -123,7 +126,20 @@ export default function ConfigNotion() {
     );
 }
 
-function PageIdDropDown() {
+function PageIdDropDown({
+  pagePublic,
+  notionPageIdId,
+}: {
+  pagePublic: boolean;
+  notionPageIdId: string;
+}) {
+  const utils = api.useUtils();
+  const updatePageFormVisibilityMut =
+    api.notionConfig.updatePageFormVisibility.useMutation({
+      onSuccess: async () =>
+        await utils.notionConfig.getNotionApiKeysAndPageIds.invalidate(),
+    });
+
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
@@ -146,28 +162,34 @@ function PageIdDropDown() {
           <div className="py-1">
             <Menu.Item>
               {({ active }) => (
-                <a
-                  href="#"
+                <button
+                  type="button"
                   className={classNames(
                     active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                     "block px-4 py-2 text-sm",
                   )}
+                  onClick={() =>
+                    updatePageFormVisibilityMut.mutate({
+                      public: !pagePublic,
+                      notionPageIdId,
+                    })
+                  }
                 >
-                  Make Form Public
-                </a>
+                  {pagePublic ? "Set private" : "Set public"}
+                </button>
               )}
             </Menu.Item>
             <Menu.Item>
               {({ active }) => (
-                <a
-                  href="#"
+                <button
+                  type="button"
                   className={classNames(
                     active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                     "block px-4 py-2 text-sm",
                   )}
                 >
-                  Delete
-                </a>
+                  Delete form
+                </button>
               )}
             </Menu.Item>
           </div>
