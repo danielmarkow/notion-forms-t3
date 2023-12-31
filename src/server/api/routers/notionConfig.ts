@@ -146,6 +146,26 @@ export const notionConfigRouter = createTRPCRouter({
         });
       }
     }),
+  removeNotionPageId: protectedProcedure
+    .input(z.object({ notionPageIdId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.db
+          .delete(notionPageIds)
+          .where(
+            and(
+              eq(notionPageIds.id, input.notionPageIdId),
+              eq(notionPageIds.createdById, ctx.session.user.id),
+            ),
+          );
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error deleting Notion Page Id",
+          cause: error,
+        });
+      }
+    }),
   updatePageFormVisibility: protectedProcedure
     .input(z.object({ public: z.boolean(), notionPageIdId: z.string() }))
     .mutation(async ({ ctx, input }) => {
