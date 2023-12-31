@@ -100,9 +100,9 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
   if (isSuccess && formState !== undefined)
     return (
       <>
-        <p>{JSON.stringify(data.formStructure)}</p>
+        {/* <p>{JSON.stringify(data.formStructure)}</p> */}
         {/* <p>{JSON.stringify(data.dbTitle)}</p> */}
-        <p>{JSON.stringify(formState)}</p>
+        {/* <p>{JSON.stringify(formState)}</p> */}
         <h1 className="text-sm font-medium">
           {data.dbTitle.length > 0 && data.dbTitle[0]?.plain_text}
         </h1>
