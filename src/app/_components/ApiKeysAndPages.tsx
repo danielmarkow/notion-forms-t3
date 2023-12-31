@@ -24,7 +24,7 @@ export default function ApiKeysAndPageIds({
           {({ open }) => (
             <>
               <Disclosure.Button className="flex w-full justify-between px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring ">
-                <span>Notion API Key Name: {conf.notionApiKeyName}</span>
+                <span>{conf.notionApiKeyName}</span>
                 <div className="flex items-center gap-x-1 align-middle">
                   <span className="text-xs text-gray-300">
                     {open === false && "expand"}

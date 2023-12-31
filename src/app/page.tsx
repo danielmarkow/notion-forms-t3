@@ -9,8 +9,9 @@ export default async function Home() {
       <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 text-center">
         <h1 className="bold text-xl">Notion Forms</h1>
         <h2>
-          Collect data into a Notion DB without sharing the entire DB. Link your
-          Notion DB - a shareable form is autmatically created for you!
+          Collect data into a Notion Database without sharing the entire
+          database. Link your Notion DB and a shareable form is autmatically
+          created for you!
         </h2>
         <div className="flex flex-col items-center justify-center gap-4">
           <p className="text-center text-2xl text-white">

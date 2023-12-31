@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "~/trpc/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const newCredentialsSchema = z.object({
   notionApiKey: z.string(),
@@ -16,6 +17,8 @@ const newCredentialsSchema = z.object({
 type NewCredentials = z.infer<typeof newCredentialsSchema>;
 
 export default function NewCredentials() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -27,7 +30,10 @@ export default function NewCredentials() {
 
   const addNotionCredentialsMut =
     api.notionConfig.addNotionCredentials.useMutation({
-      onSuccess: () => reset(),
+      onSuccess: () => {
+        reset();
+        router.push("/config");
+      },
     });
 
   const submit = (data: FieldValues) => {
@@ -45,7 +51,7 @@ export default function NewCredentials() {
               Notion API Key
             </label>
             <input
-              type="text"
+              type="password"
               id="notionApiKey"
               {...register("notionApiKey")}
               className="w-full border border-gray-300 p-0.5"

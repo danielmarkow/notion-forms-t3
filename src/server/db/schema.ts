@@ -43,7 +43,9 @@ export const notionPageIds = mysqlTable(
     createdById: varchar("createdById", { length: 255 }).notNull(),
     notionPageId: text("notion_page_id").notNull(),
     notionDbName: text("notion_db_name"),
-    notionApiKeyId: varchar("notion_api_key_id", { length: 21 }).notNull(),
+    notionApiKeyId: varchar("notion_api_key_id", { length: 21 })
+      .references(() => notionApiKeys.id, { onDelete: "cascade" })
+      .notNull(),
     public: boolean("public").notNull(),
     createdAt: timestamp("created_at")
       .default(sql`CURRENT_TIMESTAMP`)

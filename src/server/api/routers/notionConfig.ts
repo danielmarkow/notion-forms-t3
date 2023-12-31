@@ -4,7 +4,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import crypto from "node:crypto";
 import { nanoid } from "nanoid";
 import { notionApiKeys, notionPageIds } from "~/server/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 function encrypt(rawStr: string, CRYPTO_IV: string, CRYPTO_PASSWORD: string) {
@@ -120,5 +120,29 @@ export const notionConfigRouter = createTRPCRouter({
         notionApiKeyId: input.notionApiKeyId,
         public: false,
       });
+    }),
+  removeNotionApiKey: protectedProcedure
+    .input(
+      z.object({
+        notionApiKeyId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.db
+          .delete(notionApiKeys)
+          .where(
+            and(
+              eq(notionApiKeys.id, input.notionApiKeyId),
+              eq(notionApiKeys.createdById, ctx.session.user.id),
+            ),
+          );
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error deleting Notion API key",
+          cause: error,
+        });
+      }
     }),
 });
