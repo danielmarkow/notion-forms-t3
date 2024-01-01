@@ -111,7 +111,7 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
         </h2>
         <div className="h-5" />
         <div className="flex justify-center">
-          <form className="w-2/3 text-sm">
+          <form className="w-full py-2 text-sm md:w-2/3 md:py-0">
             <div className="flex flex-col gap-y-3">
               {Object.keys(formState).map((k) => (
                 <div key={k}>
