@@ -11,7 +11,7 @@ import type {
 } from "../_types/newPage";
 
 // generates the data structure to bind the forms to
-// is already in a format, that can be send to Notion
+// is already in a format, that can be send to Notion (new page)
 // as of now the same for public and private forms
 
 export function formDataStructureGen(

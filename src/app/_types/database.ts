@@ -1,3 +1,5 @@
+// typing data incoming from Notion
+
 export type Database = {
   object: string;
   id: string;

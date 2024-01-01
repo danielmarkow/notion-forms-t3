@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+// types and validation for outgoing data
+
 export const dateRequest = z.object({
   start: z.string(),
   end: z.string().optional().nullable(),
