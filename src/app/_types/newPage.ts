@@ -94,15 +94,7 @@ export const notionRichTextSchema = z.object({
   ),
 });
 
-// export const notionRichTextSchema = z.object({
-//   type: z.literal("rich_text"),
-//   rich_text: z.object({
-//     content: z.string(),
-//     link: z.string().nullable(),
-//   }),
-// });
-
-export type RichText = z.infer<typeof notionRichTextSchema>;
+export type NotionRichText = z.infer<typeof notionRichTextSchema>;
 
 export const notionPageSchema = z.record(
   notionDateSchema

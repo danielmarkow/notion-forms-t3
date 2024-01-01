@@ -3,16 +3,9 @@
 import { useEffect, useState } from "react";
 import type { MultiSelectOption } from "~/app/_types/database";
 import { api } from "~/trpc/react";
-import type {
-  NotionDate,
-  NotionTitle,
-  NotionMultiSelect,
-  NotionUrl,
-  NotionPage,
-  NotionCheckbox,
-  NotionEmail,
-} from "~/app/_types/newPage";
+import type { NotionPage } from "~/app/_types/newPage";
 import { notionPageSchema } from "~/app/_types/newPage";
+import { formDataStructureGen } from "~/app/_utils/formGen";
 
 export default function NotionForm({ params }: { params: { formId: string } }) {
   const { data, isSuccess, isError, isLoading } =
@@ -24,60 +17,9 @@ export default function NotionForm({ params }: { params: { formId: string } }) {
 
   const [formState, setFormState] = useState<NotionPage>();
   const generateNewPage = () => {
-    const newPage: NotionPage = {};
-
     const formKeys = Object.keys(data!.formStructure);
     const formStructure = data!.formStructure;
-
-    for (const k of formKeys) {
-      // TODO add other properties
-      if (formStructure[k]!.type === "date") {
-        newPage[k] = {
-          type: formStructure[k]!.type,
-          date: { start: "" },
-        } as NotionDate;
-      } else if (formStructure[k]!.type === "title") {
-        newPage[k] = {
-          type: formStructure[k]!.type,
-          title: [{ type: "text", text: { content: "", link: null } }],
-        } as NotionTitle;
-      } else if (formStructure[k]!.type === "multi_select") {
-        newPage[k] = {
-          type: "multi_select",
-          multi_select: [],
-        } as NotionMultiSelect;
-      } else if (formStructure[k]!.type === "url") {
-        newPage[k] = {
-          type: "url",
-          url: "",
-        } as NotionUrl;
-      } else if (formStructure[k]!.type === "checkbox") {
-        newPage[k] = {
-          type: "checkbox",
-          checkbox: false,
-        } as NotionCheckbox;
-      } else if (formStructure[k]!.type === "email") {
-        newPage[k] = {
-          type: "email",
-          email: "",
-        } as NotionEmail;
-      } else if (formStructure[k]!.type === "rich_text") {
-        newPage[k] = {
-          type: "rich_text",
-          rich_text: [
-            {
-              type: "text",
-              text: {
-                content: "",
-                link: null,
-              },
-              plain_text: "",
-              href: null,
-            },
-          ],
-        };
-      }
-    }
+    const newPage: NotionPage = formDataStructureGen(formKeys, formStructure);
     return newPage;
   };
 

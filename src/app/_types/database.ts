@@ -50,6 +50,11 @@ export type Database = {
   request_id?: string;
 };
 
+export type Properties = Record<
+  string,
+  Date | MultiSelect | Title | URL | Checkbox | Email | RichText
+>;
+
 // Property types
 
 export type Date = {
@@ -124,12 +129,3 @@ export type RichText = {
     },
   ];
 };
-
-// export type RichText = {
-//   id: string;
-//   type: "rich_text";
-//   rich_text: {
-//     content: string;
-//     link: string | null;
-//   };
-// };
